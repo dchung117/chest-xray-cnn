@@ -39,4 +39,5 @@ def get_model(input_shape: tuple[int, int, int],
     x = layers.Dense(1, activation="sigmoid")(x)
     
     model = tf.keras.Model(inception.input, x)
+    model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["acc"])
     return model
