@@ -1,4 +1,5 @@
-
+import argparse
+from typing import Literal
 import pathlib
 import pandas as pd
 import tensorflow.keras as keras
@@ -13,7 +14,38 @@ NEGATIVE_LABEL = "No Finding"
 TEST_RATIO = 0.2
 IMG_HEIGHT, IMG_WIDTH = 256, 256
 
+def plot_metrics(history: keras.callbacks.History, metric: Literal["acc", "loss"]) -> None:
+    """
+    Plot training and test metrics.
+    
+    Args
+    ----
+        history: keras.callbacks.History
+            History containing training/test metrics
+        metric: Literal["acc", "loss"]
+            Metric to plot
+    
+    Returns
+    -------
+        None
+    """
+    train_metric = history[metric]
+    test_metric = history["val_"+metric]
+    epochs = range(len(train_metric))
+    plt.subplot(2, 1, 1)
+    plt.plot(epochs, train_metric)
+    plt.plot(epochs, test_metric)
+    plt.xlabel("epoch")
+    plt.ylabel(metric)
+    plt.legend(["train", "test"], loc="lower right")
+    plt.savefig(f"{metric}.png")
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", action="store_true", help="Train the model.")
+    parser.add_argument("--eval", action="store_true", help="Evaluate the model.")
+    args = parser.parse_args()
+
     # Read in metadata
     metadata = pd.read_csv(DATA_DIR / "labels.csv")
     
@@ -59,7 +91,25 @@ if __name__ == "__main__":
     )
     
     # Train model
-    n_steps_train = len(list(train_pos_dir.iterdir())) + len(list(train_neg_dir.iterdir()))
-    n_steps_test = len(list(test_pos_dir.iterdir())) + len(list(test_neg_dir.iterdir()))
-    print("Training steps: ", n_steps_train)
-    print("Test steps: ", n_steps_test)
+    if args.train:
+        n_steps_train = len(list(train_pos_dir.iterdir())) + len(list(train_neg_dir.iterdir()))
+        n_steps_test = len(list(test_pos_dir.iterdir())) + len(list(test_neg_dir.iterdir()))
+        print("Training steps: ", n_steps_train)
+        print("Test steps: ", n_steps_test)
+        
+
+        history = model.fit(
+            train_gen,
+            steps_per_epoch=n_steps_train,
+            epochs=20,
+            validation_data=test_gen,
+            validation_steps=n_steps_test,
+            verbose=2
+        )
+        model.save("model.keras")
+        
+        plot_metrics(history.history, "loss")
+        plot_metrics(history.history, "acc")
+        # Evaluate the model
+        if args.eval:
+            model = keras.models.load_model("model.keras")
