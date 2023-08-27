@@ -54,10 +54,10 @@ if __name__ == "__main__":
     model = get_model((IMG_HEIGHT, IMG_WIDTH, 3))
     print(model.summary())
 
-    train_dir = DATA_DIR / "train"
+    train_dir, test_dir = DATA_DIR / "train", DATA_DIR / "test"
     train_pos_dir, train_neg_dir = train_dir / "positive", train_dir / "negative"
-    
-    # dataloaders
+    test_pos_dir, test_neg_dir = test_dir / "positive", test_dir / "negative"
+
     train_aug = keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
         rotation_range=4,
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     history = model.fit(
         train_gen,
         steps_per_epoch=n_steps_train,
-        epochs=20,
+        epochs=50,
         validation_data=test_gen,
         validation_steps=n_steps_test,
         verbose=2
