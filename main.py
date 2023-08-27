@@ -85,23 +85,22 @@ if __name__ == "__main__":
     )
     
     # Train model
-    if args.train:
-        n_steps_train = len(list(train_pos_dir.iterdir())) + len(list(train_neg_dir.iterdir()))
-        n_steps_test = len(list(test_pos_dir.iterdir())) + len(list(test_neg_dir.iterdir()))
-        print("Training steps: ", n_steps_train)
-        print("Test steps: ", n_steps_test)
-        
+    n_steps_train = len(list(train_pos_dir.iterdir())) + len(list(train_neg_dir.iterdir()))
+    n_steps_test = len(list(test_pos_dir.iterdir())) + len(list(test_neg_dir.iterdir()))
+    print("Training steps: ", n_steps_train)
+    print("Test steps: ", n_steps_test)
+    
 
-        history = model.fit(
-            train_gen,
-            steps_per_epoch=n_steps_train,
-            epochs=20,
-            validation_data=test_gen,
-            validation_steps=n_steps_test,
-            verbose=2
-        )
-        model.save("model.keras")
-        
-        plot_metrics(history.history, "loss")
-        plot_metrics(history.history, "acc")
+    history = model.fit(
+        train_gen,
+        steps_per_epoch=n_steps_train,
+        epochs=20,
+        validation_data=test_gen,
+        validation_steps=n_steps_test,
+        verbose=2
+    )
+    model.save("model.keras")
+    
+    plot_metrics(history.history, "loss")
+    plot_metrics(history.history, "acc")
 
