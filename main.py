@@ -3,6 +3,7 @@ from typing import Literal
 import pathlib
 import pandas as pd
 import tensorflow.keras as keras
+import matplotlib.pyplot as plt
 
 from preprocess import prepare_data, create_split_dir
 from model import get_model
@@ -32,13 +33,13 @@ def plot_metrics(history: keras.callbacks.History, metric: Literal["acc", "loss"
     train_metric = history[metric]
     test_metric = history["val_"+metric]
     epochs = range(len(train_metric))
-    plt.subplot(2, 1, 1)
     plt.plot(epochs, train_metric)
     plt.plot(epochs, test_metric)
     plt.xlabel("epoch")
     plt.ylabel(metric)
     plt.legend(["train", "test"], loc="lower right")
     plt.savefig(f"{metric}.png")
+    plt.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -59,9 +60,8 @@ if __name__ == "__main__":
     model = get_model((IMG_HEIGHT, IMG_WIDTH, 3))
     print(model.summary())
 
-    train_dir, test_dir = DATA_DIR / "train", DATA_DIR / "test"
+    train_dir = DATA_DIR / "train"
     train_pos_dir, train_neg_dir = train_dir / "positive", train_dir / "negative"
-    test_pos_dir, test_neg_dir = test_dir / "positive", test_dir / "negative"
     
     # dataloaders
     train_aug = keras.preprocessing.image.ImageDataGenerator(
@@ -110,6 +110,4 @@ if __name__ == "__main__":
         
         plot_metrics(history.history, "loss")
         plot_metrics(history.history, "acc")
-        # Evaluate the model
-        if args.eval:
-            model = keras.models.load_model("model.keras")
+
