@@ -1,4 +1,3 @@
-import argparse
 from typing import Literal
 import pathlib
 import pandas as pd
@@ -42,11 +41,6 @@ def plot_metrics(history: keras.callbacks.History, metric: Literal["acc", "loss"
     plt.close()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--train", action="store_true", help="Train the model.")
-    parser.add_argument("--eval", action="store_true", help="Evaluate the model.")
-    args = parser.parse_args()
-
     # Read in metadata
     metadata = pd.read_csv(DATA_DIR / "labels.csv")
     
